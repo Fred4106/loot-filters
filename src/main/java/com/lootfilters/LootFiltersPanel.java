@@ -3,6 +3,7 @@ package com.lootfilters;
 import com.lootfilters.lang.CompileException;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.client.ui.PluginPanel;
+import net.runelite.client.util.ImageUtil;
 import net.runelite.client.util.LinkBrowser;
 
 import javax.swing.Box;
@@ -64,9 +65,12 @@ public class LootFiltersPanel extends PluginPanel {
                 "Import filter from clipboard.",
                 this::onImportClipboard);
 
+        var dumpFilter = createIconButton(ImageUtil.luminanceScale(Icons.RELOAD,30),
+            "Dump active filter.",
+            this::dumpActiveFilter);
         var reloadFilters = createIconButton(Icons.RELOAD,
-                "Reload filters from disk.",
-                this::onReloadFilters);
+            "Reload filters from disk.",
+            this::onReloadFilters);
         var browseFolder = createIconButton(Icons.FOLDER,
                 "View the plugin directory, where filters, sound files, and icon files should be placed, in the system file browser.",
                 this::onBrowseFolder);
@@ -85,6 +89,7 @@ public class LootFiltersPanel extends PluginPanel {
         top.add(Box.createGlue());
         top.add(reloadFilters);
         top.add(browseFolder);
+        top.add(dumpFilter);
 
         mid.add(label);
 
@@ -193,7 +198,13 @@ public class LootFiltersPanel extends PluginPanel {
         reflowFilterSelect(plugin.getLoadedFilters(), plugin.getSelectedFilterName());
         reflowFilterDescription();
     }
-
+    private void dumpActiveFilter() {
+        LootFilter active = plugin.getActiveFilter();
+        for (int i = 0; i < active.getRules().size(); i++) {
+            FilterRule rule = active.getRules().get(i);
+            System.out.println(rule.toString());
+        }
+    }
     private void onBrowseFolder() {
         LinkBrowser.open(LootFiltersPlugin.PLUGIN_DIRECTORY.getAbsolutePath());
     }
